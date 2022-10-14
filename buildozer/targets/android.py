@@ -265,7 +265,7 @@ class TargetAndroid(Target):
                                 'adb.exe')
             self.javac_cmd = self._locate_java('javac.exe')
             self.keytool_cmd = self._locate_java('keytool.exe')
-        # darwin, linux
+        # darwin, linux, freebsd
         else:
             self.adb_executable = join(self.android_sdk_dir, 'platform-tools', 'adb')
             self.javac_cmd = self._locate_java('javac')
@@ -413,7 +413,7 @@ class TargetAndroid(Target):
             archive = 'commandlinetools-win-{}_latest.zip'.format(DEFAULT_SDK_TAG)
         elif platform in ('darwin', ):
             archive = 'commandlinetools-mac-{}_latest.zip'.format(DEFAULT_SDK_TAG)
-        elif platform.startswith('linux'):
+        elif platform.startswith('linux') or platform.startswith('freebsd'):
             archive = 'commandlinetools-linux-{}_latest.zip'.format(DEFAULT_SDK_TAG)
         else:
             raise SystemError('Unsupported platform: {0}'.format(platform))
@@ -453,13 +453,14 @@ class TargetAndroid(Target):
 
         is_darwin = platform == 'darwin'
         is_linux = platform.startswith('linux')
+        is_freebsd = platform.startswith('freebsd')
 
         if platform in ('win32', 'cygwin'):
             # Checking of 32/64 bits at Windows from: https://stackoverflow.com/a/1405971/798575
             import struct
             archive = 'android-ndk-r{0}-windows-{1}.zip'
             is_64 = (8 * struct.calcsize("P") == 64)
-        elif is_darwin or is_linux:
+        elif is_darwin or is_linux or is_freebsd:
             _platform = 'linux' if is_linux else 'darwin'
             if self.android_ndk_version in ['10c', '10d', '10e']:
                 ext = 'bin'
